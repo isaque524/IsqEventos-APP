@@ -1,6 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { error } from '@angular/compiler/src/util';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import Swal from 'sweetalert2';
+import { Evento } from '../models/Evento';
+import { EventoService } from '../services/evento.service';
 
 @Component({
   selector: 'app-eventos',
@@ -8,12 +12,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./eventos.component.scss'],
 })
 export class EventosComponent implements OnInit {
-  public eventos: any = [];
-  public eventosFiltrados: any = [];
-  LarguraImagem: number = 150;
-  margemImagem: number = 2;
-  exibirImagem: boolean = true;
+  public eventos: Evento[] = [];
+  public eventosFiltrados: Evento[] = [];
+  public LarguraImagem: number = 150;
+  public margemImagem: number = 2;
+  public exibirImagem: boolean = true;
   private _filtroLista: string = '';
+
+  modalRef?: BsModalRef;
 
   public get filtroLista(): string {
     return this._filtroLista;
@@ -26,7 +32,7 @@ export class EventosComponent implements OnInit {
       : this.eventos;
   }
 
-  filtrarEventos(filtrarPor: string): any {
+  public filtrarEventos(filtrarPor: string): any {
     filtrarPor = filtrarPor.toLocaleLowerCase();
     return this.eventos.filter(
       (evento: { tema: string; local: string }) =>
@@ -35,24 +41,44 @@ export class EventosComponent implements OnInit {
     );
   }
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private eventoService: EventoService,
+    private modalService: BsModalService
+  ) {}
 
   ngOnInit(): void {
     this.getEventos();
   }
-
-  alterarValorImagem() {
+  public alterarValorImagem(): void {
     this.exibirImagem = !this.exibirImagem;
   }
 
   public getEventos(): void {
-    this.http
-      .get('https://isqeventosapi.azurewebsites.net/api/evento')
-      .subscribe(
-        (response) => {
-          (this.eventos = response), (this.eventosFiltrados = this.eventos);
-        },
-        (error) => console.log(error)
-      );
+    this.eventoService.getEventos().subscribe(
+      (_eventos: Evento[]) => {
+        (this.eventos = _eventos), (this.eventosFiltrados = this.eventos);
+      },
+      (error) => console.log(error)
+    );
+  }
+
+  openModal(template: TemplateRef<void>) {
+    this.modalRef = this.modalService.show(template, { class: 'modal-sm' });
+  }
+
+  confirm(): void {
+    this.modalRef?.hide();
+    Swal.fire({
+      title: 'Deletado!',
+      text: 'O evento foi deletado com Sucesso.',
+      icon: 'success',
+      showConfirmButton: false,
+      timer: 1500
+    });
+  }
+
+  decline(): void {
+    this.modalRef?.hide();
   }
 }
+

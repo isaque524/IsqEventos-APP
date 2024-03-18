@@ -10,6 +10,10 @@ import { PalestrantesComponent } from './palestrantes/palestrantes.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavComponent } from './nav/nav.component';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { DateTimeFormatPipe } from './helpers/DateTimeFormat.pipe';
 
 @NgModule({
   declarations: [
@@ -17,6 +21,7 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
     EventosComponent,
     PalestrantesComponent,
     NavComponent,
+    DateTimeFormatPipe,
   ],
   imports: [
     BrowserModule,
@@ -25,6 +30,9 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
     BrowserAnimationsModule,
     CollapseModule.forRoot(),
     FormsModule,
+    BsDropdownModule.forRoot(),
+    TooltipModule.forRoot(),
+    ModalModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],
