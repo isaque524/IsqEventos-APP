@@ -1,3 +1,4 @@
+import { NgxSpinnerService } from 'ngx-spinner';
 import { HttpClient } from '@angular/common/http';
 import { error } from '@angular/compiler/src/util';
 import { Component, OnInit, TemplateRef } from '@angular/core';
@@ -43,23 +44,35 @@ export class EventosComponent implements OnInit {
 
   constructor(
     private eventoService: EventoService,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit(): void {
+    this.spinner.show();
     this.getEventos();
   }
+
   public alterarValorImagem(): void {
     this.exibirImagem = !this.exibirImagem;
   }
 
   public getEventos(): void {
-    this.eventoService.getEventos().subscribe(
-      (_eventos: Evento[]) => {
+    this.eventoService.getEventos().subscribe({
+      next: (_eventos: Evento[]) => {
         (this.eventos = _eventos), (this.eventosFiltrados = this.eventos);
       },
-      (error) => console.log(error)
-    );
+      error: (error: any) => {
+        this.spinner.hide();
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao Carregar os Eventos ',
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      },
+      complete: () => this.spinner.hide(),
+    });
   }
 
   openModal(template: TemplateRef<void>) {
@@ -73,7 +86,7 @@ export class EventosComponent implements OnInit {
       text: 'O evento foi deletado com Sucesso.',
       icon: 'success',
       showConfirmButton: false,
-      timer: 1500
+      timer: 1500,
     });
   }
 
@@ -81,4 +94,3 @@ export class EventosComponent implements OnInit {
     this.modalRef?.hide();
   }
 }
-
